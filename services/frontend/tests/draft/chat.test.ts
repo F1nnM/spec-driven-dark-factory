@@ -5,7 +5,7 @@ import { drizzle } from 'drizzle-orm/pglite'
 import { eq, asc } from 'drizzle-orm'
 import { describe, expect, it, beforeAll, afterAll } from 'vitest'
 import * as schema from '../../server/database/schema'
-const migrationPath = resolve(__dirname, '../../server/database/migrations/0000_overconfident_black_queen.sql')
+const migrationPath = resolve(__dirname, '../../server/database/migrations/0000_redundant_thor.sql')
 
 describe('chat messages and revision management', () => {
   let pg: InstanceType<typeof PGlite>

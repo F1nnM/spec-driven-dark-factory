@@ -2,7 +2,7 @@ import { eq, and, asc, desc } from 'drizzle-orm'
 import type Anthropic from '@anthropic-ai/sdk'
 
 export default defineEventHandler(async (event) => {
-  const user = await requireAuth(event)
+  const { user } = await requireUserSession(event)
   const projectId = getRouterParam(event, 'id')
 
   if (!projectId) {

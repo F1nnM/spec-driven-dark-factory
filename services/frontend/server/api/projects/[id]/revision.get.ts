@@ -1,7 +1,7 @@
 import { eq, and, inArray, asc } from 'drizzle-orm'
 
 export default defineEventHandler(async (event) => {
-  const user = await requireAuth(event)
+  const { user } = await requireUserSession(event)
   const projectId = getRouterParam(event, 'id')
 
   if (!projectId) {

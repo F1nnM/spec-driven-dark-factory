@@ -1,7 +1,7 @@
 import { eq, sql } from 'drizzle-orm'
 
 export default defineEventHandler(async (event) => {
-  const user = await requireAuth(event)
+  const { user } = await requireUserSession(event)
 
   const rows = await db
     .select({

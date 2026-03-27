@@ -1,10 +1,4 @@
-import { deleteSession } from '../../utils/auth'
-
 export default defineEventHandler(async (event) => {
-  const token = getCookie(event, 'sf_session')
-  if (token) {
-    await deleteSession(token)
-  }
-  deleteCookie(event, 'sf_session')
+  await clearUserSession(event)
   return { ok: true }
 })

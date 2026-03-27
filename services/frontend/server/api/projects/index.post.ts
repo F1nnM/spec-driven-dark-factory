@@ -1,7 +1,7 @@
 import { getDecryptedGithubToken } from '../../utils/github'
 
 export default defineEventHandler(async (event) => {
-  const user = await requireAuth(event)
+  const { user } = await requireUserSession(event)
   const body = await readBody(event)
 
   const name = body?.name?.trim()

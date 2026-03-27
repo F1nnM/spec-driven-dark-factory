@@ -1,6 +1,8 @@
 import tailwindcss from '@tailwindcss/vite'
 
 export default defineNuxtConfig({
+  modules: ['nuxt-auth-utils'],
+
   css: ['~/assets/css/tailwind.css'],
 
   devServer: {
@@ -21,11 +23,16 @@ export default defineNuxtConfig({
     hasuraAdminSecret: '',
     hasuraInternalEndpoint: '',
     encryptionKey: '',
-    githubClientId: '',
-    githubClientSecret: '',
+    sessionPassword: '',
     baseUrl: 'http://localhost:3000',
     agentUrl: 'http://agent:3001',
     allowedUsers: '',
+    oauth: {
+      github: {
+        clientId: '',
+        clientSecret: '',
+      },
+    },
     public: {
       hasuraHttpEndpoint: '',
       hasuraWsEndpoint: '',

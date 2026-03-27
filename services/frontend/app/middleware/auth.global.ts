@@ -1,5 +1,5 @@
 export default defineNuxtRouteMiddleware(async (to) => {
-  const publicRoutes = ['/login', '/auth/github', '/auth/github/callback']
+  const publicRoutes = ['/login', '/auth/github']
 
   if (publicRoutes.some(route => to.path.startsWith(route))) {
     return

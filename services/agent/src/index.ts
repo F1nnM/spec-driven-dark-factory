@@ -3,6 +3,8 @@ import { handleGetSpecs } from './api/specs.js'
 import { handleDraft } from './api/drafter.js'
 import { handlePlan, handleApprove } from './api/evolution.js'
 import { handleImplement } from './api/pipeline.js'
+import { handleAudit } from './api/fulfillment.js'
+import { handleAnalyze } from './api/analyzer.js'
 
 export async function handleRequest(req: Request): Promise<Response> {
   const url = new URL(req.url)
@@ -43,6 +45,16 @@ export async function handleRequest(req: Request): Promise<Response> {
   const implementMatch = url.pathname.match(/^\/api\/projects\/([^/]+)\/implement$/)
   if (implementMatch && req.method === 'POST') {
     return handleImplement(req, implementMatch[1]!)
+  }
+
+  const auditMatch = url.pathname.match(/^\/api\/projects\/([^/]+)\/audit$/)
+  if (auditMatch && req.method === 'POST') {
+    return handleAudit(req, auditMatch[1]!)
+  }
+
+  const analyzeMatch = url.pathname.match(/^\/api\/projects\/([^/]+)\/analyze$/)
+  if (analyzeMatch && req.method === 'POST') {
+    return handleAnalyze(req, analyzeMatch[1]!)
   }
 
   return new Response('Not Found', { status: 404 })

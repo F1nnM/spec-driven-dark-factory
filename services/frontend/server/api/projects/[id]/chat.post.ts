@@ -6,8 +6,6 @@ import {
   revisions,
   chatMessages,
 } from '../../../../database/schema'
-import { requireAuth } from '../../../../utils/auth'
-import { db } from '../../../../utils/db'
 import type Anthropic from '@anthropic-ai/sdk'
 
 export default defineEventHandler(async (event) => {

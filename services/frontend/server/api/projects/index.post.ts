@@ -1,8 +1,5 @@
 import { createError, readBody } from 'h3'
 import { projects, projectMembers } from '../../database/schema'
-import { requireAuth } from '../../utils/auth'
-import { encrypt } from '../../utils/crypto'
-import { db } from '../../utils/db'
 
 export default defineEventHandler(async (event) => {
   const { userId } = await requireAuth(event)

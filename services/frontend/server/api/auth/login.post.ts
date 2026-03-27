@@ -1,8 +1,6 @@
 import { eq } from 'drizzle-orm'
 import { createError, readBody } from 'h3'
 import { users } from '../../database/schema'
-import { getSession, verifyPassword } from '../../utils/auth'
-import { db } from '../../utils/db'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
@@ -30,7 +28,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 401, statusMessage: 'Invalid credentials' })
   }
 
-  const session = await getSession(event)
+  const session = await getAppSession(event)
   await session.update({ userId: user.id })
 
   return {

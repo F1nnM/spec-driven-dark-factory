@@ -1,7 +1,5 @@
 import { eq, sql } from 'drizzle-orm'
 import { projects, projectMembers } from '../../database/schema'
-import { requireAuth } from '../../utils/auth'
-import { db } from '../../utils/db'
 
 export default defineEventHandler(async (event) => {
   const { userId } = await requireAuth(event)

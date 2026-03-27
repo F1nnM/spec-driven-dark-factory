@@ -5,7 +5,76 @@ const { revision, steps, changes, approving, error, loading, loadReview, approve
   useReview(projectId)
 
 const diffCollapsed = ref(false)
+const showInterruptDialog = ref(false)
+const interrupting = ref(false)
 let pollInterval: ReturnType<typeof setInterval> | null = null
+
+// GraphQL subscription for real-time updates
+const subscriptionQuery = `
+  subscription RevisionSteps($projectId: uuid!) {
+    revisions(
+      where: { project_id: { _eq: $projectId }, status: { _in: ["implementing", "approved"] } }
+      limit: 1
+    ) {
+      id
+      revision_number
+      status
+      branch_name
+      created_at
+      completed_at
+      evolution_steps(order_by: { step_number: asc }) {
+        id
+        step_number
+        status
+        branch_name
+        review_loop_count
+        review_summary
+      }
+    }
+  }
+`
+
+const { data: subscriptionData, close: closeSubscription } = useGraphqlSubscription<{
+  revisions: {
+    id: string
+    revision_number: number
+    status: string
+    branch_name: string
+    created_at: string
+    completed_at: string | null
+    evolution_steps: {
+      id: string
+      step_number: number
+      status: string
+      branch_name: string
+      review_loop_count: number
+      review_summary: string | null
+    }[]
+  }[]
+}>(subscriptionQuery, { projectId })
+
+// Update local state from subscription data
+watch(subscriptionData, (data) => {
+  if (data?.revisions && data.revisions.length > 0) {
+    const rev = data.revisions[0]!
+    revision.value = {
+      id: rev.id,
+      revisionNumber: rev.revision_number,
+      status: rev.status,
+      branchName: rev.branch_name,
+      createdAt: rev.created_at,
+      completedAt: rev.completed_at,
+    }
+    steps.value = rev.evolution_steps.map((s) => ({
+      id: s.id,
+      stepNumber: s.step_number,
+      status: s.status,
+      branchName: s.branch_name,
+      reviewLoopCount: s.review_loop_count,
+      reviewSummary: s.review_summary,
+    }))
+  }
+})
 
 onMounted(async () => {
   await loadReview()
@@ -14,6 +83,7 @@ onMounted(async () => {
 
 onUnmounted(() => {
   stopPolling()
+  closeSubscription()
 })
 
 watch(
@@ -28,8 +98,9 @@ watch(
 )
 
 function startPollingIfNeeded() {
+  // Only poll as a fallback if subscription is not delivering data
   if (revision.value?.status === 'implementing' && !pollInterval) {
-    pollInterval = setInterval(pollStatus, 5000)
+    pollInterval = setInterval(pollStatus, 15000)
   }
 }
 
@@ -46,6 +117,25 @@ async function handleApprove() {
     diffCollapsed.value = true
   } catch {
     // Error already set in composable
+  }
+}
+
+async function handleInterrupt(action: 'keep_partial' | 'rollback' | 'discard', keepStepNumber?: number) {
+  interrupting.value = true
+  showInterruptDialog.value = false
+
+  try {
+    await $fetch(`/api/projects/${projectId}/interrupt`, {
+      method: 'POST',
+      body: { action, keepStepNumber },
+    })
+
+    // Reload review data after interrupt
+    await loadReview()
+  } catch (e: any) {
+    error.value = e?.data?.message || e?.statusMessage || 'Failed to interrupt implementation'
+  } finally {
+    interrupting.value = false
   }
 }
 </script>
@@ -132,8 +222,20 @@ async function handleApprove() {
         <ReviewSpecDiff :changes="changes" />
       </div>
 
-      <!-- Implementing: show status + collapsed diff -->
+      <!-- Implementing: show status + interrupt button + collapsed diff -->
       <div v-if="revision?.status === 'implementing' || revision?.status === 'approved'">
+        <div class="flex items-center justify-between mb-4">
+          <div />
+          <button
+            class="px-4 py-2 bg-red-900/50 hover:bg-red-800/50 text-red-300 border border-red-700/50 rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
+            :disabled="interrupting"
+            @click="showInterruptDialog = true"
+          >
+            <span v-if="interrupting">Interrupting...</span>
+            <span v-else>Interrupt</span>
+          </button>
+        </div>
+
         <ReviewImplementationStatus :revision="revision" :steps="steps" />
 
         <div v-if="changes.length > 0" class="mt-8">
@@ -160,5 +262,13 @@ async function handleApprove() {
         </div>
       </div>
     </template>
+
+    <!-- Interrupt Dialog -->
+    <ReviewInterruptDialog
+      v-if="showInterruptDialog"
+      :steps="steps"
+      @cancel="showInterruptDialog = false"
+      @confirm="handleInterrupt"
+    />
   </div>
 </template>

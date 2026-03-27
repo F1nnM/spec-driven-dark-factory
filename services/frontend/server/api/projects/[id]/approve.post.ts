@@ -53,6 +53,13 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'No drafting revision found' })
   }
 
+  // Check if another revision is already implementing (concurrent drafting support)
+  const [implementingRevision] = await db
+    .select()
+    .from(revisions)
+    .where(and(eq(revisions.projectId, projectId), eq(revisions.status, 'implementing')))
+    .limit(1)
+
   // Update status to approved
   await db
     .update(revisions)
@@ -86,7 +93,17 @@ export default defineEventHandler(async (event) => {
     )
   }
 
-  // Update revision status to implementing
+  if (implementingRevision) {
+    // Another revision is implementing — keep this one as 'approved' (queued)
+    // It will start implementing when the current one finishes
+    return {
+      revisionNumber: draftRevision.revisionNumber,
+      steps: agentResponse.steps,
+      queued: true,
+    }
+  }
+
+  // No other revision implementing — start this one
   await db
     .update(revisions)
     .set({ status: 'implementing' })
@@ -95,5 +112,6 @@ export default defineEventHandler(async (event) => {
   return {
     revisionNumber: draftRevision.revisionNumber,
     steps: agentResponse.steps,
+    queued: false,
   }
 })

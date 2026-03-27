@@ -22,3 +22,14 @@ select_permissions:
           project:
             id:
               _in: X-Hasura-Project-Ids
+update_permissions:
+  - role: admin
+    permission:
+      columns:
+        - status
+        - review_loop_count
+        - review_summary
+      filter: {}
+subscription_root_fields:
+  select: evolution_steps
+  select_by_pk: evolution_steps_by_pk

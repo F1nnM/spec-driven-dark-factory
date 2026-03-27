@@ -5,6 +5,8 @@ import { handlePlan, handleApprove } from './api/evolution.js'
 import { handleImplement } from './api/pipeline.js'
 import { handleAudit } from './api/fulfillment.js'
 import { handleAnalyze } from './api/analyzer.js'
+import { handleInterrupt } from './api/interrupt.js'
+import { handleRestructureEvaluate, handleRestructureExecute } from './api/restructure.js'
 
 export async function handleRequest(req: Request): Promise<Response> {
   const url = new URL(req.url)
@@ -47,6 +49,11 @@ export async function handleRequest(req: Request): Promise<Response> {
     return handleImplement(req, implementMatch[1]!)
   }
 
+  const interruptMatch = url.pathname.match(/^\/api\/projects\/([^/]+)\/interrupt$/)
+  if (interruptMatch && req.method === 'POST') {
+    return handleInterrupt(req, interruptMatch[1]!)
+  }
+
   const auditMatch = url.pathname.match(/^\/api\/projects\/([^/]+)\/audit$/)
   if (auditMatch && req.method === 'POST') {
     return handleAudit(req, auditMatch[1]!)
@@ -55,6 +62,16 @@ export async function handleRequest(req: Request): Promise<Response> {
   const analyzeMatch = url.pathname.match(/^\/api\/projects\/([^/]+)\/analyze$/)
   if (analyzeMatch && req.method === 'POST') {
     return handleAnalyze(req, analyzeMatch[1]!)
+  }
+
+  const restructureEvalMatch = url.pathname.match(/^\/api\/projects\/([^/]+)\/restructure\/evaluate$/)
+  if (restructureEvalMatch && req.method === 'POST') {
+    return handleRestructureEvaluate(req, restructureEvalMatch[1]!)
+  }
+
+  const restructureExecMatch = url.pathname.match(/^\/api\/projects\/([^/]+)\/restructure\/execute$/)
+  if (restructureExecMatch && req.method === 'POST') {
+    return handleRestructureExecute(req, restructureExecMatch[1]!)
   }
 
   return new Response('Not Found', { status: 404 })

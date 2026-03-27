@@ -50,6 +50,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // Get or create the current drafting revision
+  // Allow concurrent drafting: a new draft can be created while another is implementing
   let [draftRevision] = await db
     .select()
     .from(revisions)

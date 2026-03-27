@@ -2,6 +2,7 @@ import { handleClone, handleStatus } from './api/projects.js'
 import { handleGetSpecs } from './api/specs.js'
 import { handleDraft } from './api/drafter.js'
 import { handlePlan, handleApprove } from './api/evolution.js'
+import { handleImplement } from './api/pipeline.js'
 
 export async function handleRequest(req: Request): Promise<Response> {
   const url = new URL(req.url)
@@ -37,6 +38,11 @@ export async function handleRequest(req: Request): Promise<Response> {
   const approveMatch = url.pathname.match(/^\/api\/projects\/([^/]+)\/approve$/)
   if (approveMatch && req.method === 'POST') {
     return handleApprove(req, approveMatch[1]!)
+  }
+
+  const implementMatch = url.pathname.match(/^\/api\/projects\/([^/]+)\/implement$/)
+  if (implementMatch && req.method === 'POST') {
+    return handleImplement(req, implementMatch[1]!)
   }
 
   return new Response('Not Found', { status: 404 })

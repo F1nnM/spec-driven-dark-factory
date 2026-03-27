@@ -8,3 +8,5 @@ export type {
   Revision,
   EvolutionStep,
 } from './types.js'
+
+export * from './specs/index.js'

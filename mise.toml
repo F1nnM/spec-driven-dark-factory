@@ -5,8 +5,11 @@ ctlptl = "latest"
 k3d = "latest"
 hasura-cli = "latest"
 
+[env]
+TILT_PORT = "10352"
+
 [tasks.start]
-run = "ctlptl apply -f infra/ctlptl-cluster.yaml && tilt up --port 10352"
+run = "ctlptl apply -f infra/ctlptl-cluster.yaml && tilt up"
 
 [tasks.stop]
 run = "tilt down && ctlptl delete -f infra/ctlptl-cluster.yaml"

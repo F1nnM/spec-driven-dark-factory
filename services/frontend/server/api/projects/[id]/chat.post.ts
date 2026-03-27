@@ -1,11 +1,5 @@
 import { eq, and, asc, desc } from 'drizzle-orm'
 import { createError, readBody } from 'h3'
-import {
-  projects,
-  projectMembers,
-  revisions,
-  chatMessages,
-} from '../../../../database/schema'
 import type Anthropic from '@anthropic-ai/sdk'
 
 export default defineEventHandler(async (event) => {

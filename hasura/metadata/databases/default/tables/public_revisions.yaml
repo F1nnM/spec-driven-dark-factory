@@ -63,6 +63,3 @@ update_permissions:
         - status
         - completed_at
       filter: {}
-subscription_root_fields:
-  select: revisions
-  select_by_pk: revisions_by_pk

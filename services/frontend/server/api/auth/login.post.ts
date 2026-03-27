@@ -1,6 +1,5 @@
 import { eq } from 'drizzle-orm'
 import { createError, readBody } from 'h3'
-import { users } from '../../database/schema'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)

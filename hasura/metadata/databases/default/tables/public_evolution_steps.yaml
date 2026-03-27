@@ -30,6 +30,3 @@ update_permissions:
         - review_loop_count
         - review_summary
       filter: {}
-subscription_root_fields:
-  select: evolution_steps
-  select_by_pk: evolution_steps_by_pk

@@ -26,6 +26,7 @@ export default defineNuxtConfig({
     hasuraInternalEndpoint: '',
     encryptionKey: '',
     sessionPassword: '',
+    agentUrl: 'http://agent:3001',
     public: {
       hasuraHttpEndpoint: '',
       hasuraWsEndpoint: '',

@@ -22,6 +22,8 @@ def parse_env(content):
 
 env_vars = parse_env(secrets)
 
+watch_file('dev-secrets.env')
+
 # Create K8s secret for shared secrets
 k8s_yaml(blob("""
 apiVersion: v1

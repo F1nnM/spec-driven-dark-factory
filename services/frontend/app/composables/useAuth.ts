@@ -20,7 +20,9 @@ export function useAuth() {
 
   async function fetchUser(): Promise<AuthUser | null> {
     try {
-      const data = await $fetch<{ user: AuthUser }>('/api/auth/me')
+      // Forward cookies during SSR so the session cookie reaches the API
+      const headers = import.meta.server ? useRequestHeaders(['cookie']) : undefined
+      const data = await $fetch<{ user: AuthUser }>('/api/auth/me', { headers })
       user.value = data.user
       return data.user
     } catch {

@@ -4,6 +4,7 @@ tilt = "latest"
 ctlptl = "latest"
 k3d = "latest"
 hasura-cli = "latest"
+"aqua:boyter/scc" = "latest"
 
 [env]
 TILT_PORT = "10352"

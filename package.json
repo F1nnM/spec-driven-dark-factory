@@ -1,0 +1,20 @@
+{
+  "name": "spec-factory",
+  "type": "module",
+  "private": true,
+  "workspaces": ["services/*", "packages/*"],
+  "scripts": {
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "bun run --filter '*' test"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^4.13.2",
+    "eslint": "^9.24.0",
+    "eslint-config-prettier": "^10.1.1",
+    "prettier": "^3.5.3",
+    "typescript": "^5.8.3"
+  }
+}

@@ -1,0 +1,13 @@
+FROM oven/bun:1
+RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
+WORKDIR /app
+COPY package.json bun.lock* ./
+COPY packages/shared/package.json packages/shared/package.json
+COPY services/frontend/package.json services/frontend/package.json
+COPY services/agent/package.json services/agent/package.json
+RUN bun install
+COPY packages/shared/ packages/shared/
+COPY services/agent/ services/agent/
+WORKDIR /app/services/agent
+EXPOSE 3001
+CMD ["bun", "run", "src/index.ts"]

@@ -1,0 +1,12 @@
+FROM oven/bun:1
+WORKDIR /app
+COPY package.json bun.lock* tsconfig.base.json ./
+COPY packages/shared/package.json packages/shared/package.json
+COPY services/frontend/package.json services/frontend/package.json
+COPY services/agent/package.json services/agent/package.json
+RUN bun install
+COPY packages/shared/ packages/shared/
+COPY services/frontend/ services/frontend/
+WORKDIR /app/services/frontend
+EXPOSE 3000
+CMD ["bun", "run", "dev", "--host", "0.0.0.0"]

@@ -1,0 +1,12 @@
+[tools]
+bun = "latest"
+tilt = "latest"
+ctlptl = "latest"
+k3d = "latest"
+hasura-cli = "latest"
+
+[tasks.start]
+run = "ctlptl apply -f infra/ctlptl-cluster.yaml && tilt up --port 10352"
+
+[tasks.stop]
+run = "tilt down && ctlptl delete -f infra/ctlptl-cluster.yaml"

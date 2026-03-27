@@ -11,7 +11,7 @@ class GitError extends Error {
   }
 }
 
-async function execGit(
+export async function execGit(
   repoPath: string,
   args: string[],
   env?: Record<string, string>,

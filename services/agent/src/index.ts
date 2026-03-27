@@ -1,4 +1,6 @@
 import { handleClone, handleStatus } from './api/projects.js'
+import { handleGetSpecs } from './api/specs.js'
+import { handleDraft } from './api/drafter.js'
 
 export async function handleRequest(req: Request): Promise<Response> {
   const url = new URL(req.url)
@@ -14,6 +16,16 @@ export async function handleRequest(req: Request): Promise<Response> {
   const statusMatch = url.pathname.match(/^\/api\/projects\/([^/]+)\/status$/)
   if (statusMatch && req.method === 'GET') {
     return handleStatus(req, statusMatch[1]!)
+  }
+
+  const specsMatch = url.pathname.match(/^\/api\/projects\/([^/]+)\/specs$/)
+  if (specsMatch && req.method === 'GET') {
+    return handleGetSpecs(req, specsMatch[1]!)
+  }
+
+  const draftMatch = url.pathname.match(/^\/api\/projects\/([^/]+)\/draft$/)
+  if (draftMatch && req.method === 'POST') {
+    return handleDraft(req, draftMatch[1]!)
   }
 
   return new Response('Not Found', { status: 404 })

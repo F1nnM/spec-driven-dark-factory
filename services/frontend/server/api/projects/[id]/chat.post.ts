@@ -1,5 +1,4 @@
 import { eq, and, asc, desc } from 'drizzle-orm'
-import { createError, readBody } from 'h3'
 import type Anthropic from '@anthropic-ai/sdk'
 
 export default defineEventHandler(async (event) => {

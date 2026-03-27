@@ -1,6 +1,5 @@
 import { randomBytes } from 'node:crypto'
 import type { H3Event } from 'h3'
-import { createError, getCookie } from 'h3'
 import * as arctic from 'arctic'
 import { eq, and, gt } from 'drizzle-orm'
 import { sessions, users } from '../database/schema'

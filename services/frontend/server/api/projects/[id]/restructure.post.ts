@@ -1,5 +1,4 @@
 import { eq, and } from 'drizzle-orm'
-import { createError, readBody } from 'h3'
 
 export default defineEventHandler(async (event) => {
   const user = await requireAuth(event)

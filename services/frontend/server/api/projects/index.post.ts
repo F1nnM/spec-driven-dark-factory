@@ -1,4 +1,3 @@
-import { createError, readBody } from 'h3'
 import { getDecryptedGithubToken } from '../../utils/github'
 
 export default defineEventHandler(async (event) => {

@@ -31,9 +31,19 @@ export const chatRoleEnum = pgEnum('chat_role', ['user', 'assistant'])
 // Tables
 export const users = pgTable('users', {
   id: uuid('id').primaryKey().defaultRandom(),
-  email: text('email').unique().notNull(),
-  passwordHash: text('password_hash').notNull(),
-  name: text('name').notNull(),
+  githubId: integer('github_id').unique().notNull(),
+  username: text('username').notNull(),
+  displayName: text('display_name'),
+  avatarUrl: text('avatar_url'),
+  encryptedGithubToken: text('encrypted_github_token'),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull().$onUpdate(() => new Date()),
+})
+
+export const sessions = pgTable('sessions', {
+  id: text('id').primaryKey(),
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
 })
 
@@ -42,6 +52,7 @@ export const projects = pgTable('projects', {
   name: text('name').notNull(),
   gitUrl: text('git_url').notNull(),
   sshPrivateKeyEncrypted: text('ssh_private_key_encrypted'),
+  gitTokenUserId: uuid('git_token_user_id').references(() => users.id, { onDelete: 'set null' }),
   specsPath: text('specs_path').notNull().default('/specs'),
   currentRevision: integer('current_revision').default(0),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),

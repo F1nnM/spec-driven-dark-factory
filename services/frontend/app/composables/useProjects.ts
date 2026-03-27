@@ -20,7 +20,6 @@ export function useProjects() {
   async function createProject(input: {
     name: string
     gitUrl: string
-    sshPrivateKey: string
     specsPath?: string
   }): Promise<Project> {
     const data = await $fetch<{ project: Project }>('/api/projects', {

@@ -1,11 +1,22 @@
 interface AuthUser {
   id: string
-  email: string
-  name: string
+  username: string
+  displayName: string | null
+  avatarUrl: string | null
 }
 
 export function useAuth() {
   const user = useState<AuthUser | null>('auth-user', () => null)
+
+  function loginWithGithub() {
+    navigateTo('/auth/github', { external: true })
+  }
+
+  async function logout() {
+    await $fetch('/auth/logout', { method: 'POST' })
+    user.value = null
+    navigateTo('/login')
+  }
 
   async function fetchUser(): Promise<AuthUser | null> {
     try {
@@ -18,28 +29,5 @@ export function useAuth() {
     }
   }
 
-  async function login(email: string, password: string) {
-    const data = await $fetch<{ user: AuthUser }>('/api/auth/login', {
-      method: 'POST',
-      body: { email, password },
-    })
-    user.value = data.user
-    return data.user
-  }
-
-  async function register(email: string, password: string, name: string) {
-    const data = await $fetch<{ user: AuthUser }>('/api/auth/register', {
-      method: 'POST',
-      body: { email, password, name },
-    })
-    user.value = data.user
-    return data.user
-  }
-
-  async function logout() {
-    await $fetch('/api/auth/logout', { method: 'POST' })
-    user.value = null
-  }
-
-  return { user, login, register, logout, fetchUser }
+  return { user, loginWithGithub, logout, fetchUser }
 }

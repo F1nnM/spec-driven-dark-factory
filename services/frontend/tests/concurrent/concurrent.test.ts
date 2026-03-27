@@ -5,9 +5,7 @@ import { drizzle } from 'drizzle-orm/pglite'
 import { eq, and } from 'drizzle-orm'
 import { describe, expect, it, beforeAll, afterAll } from 'vitest'
 import * as schema from '../../server/database/schema'
-import { hashPassword } from '../../server/utils/password'
-
-const migrationPath = resolve(__dirname, '../../server/database/migrations/0000_mushy_edwin_jarvis.sql')
+const migrationPath = resolve(__dirname, '../../server/database/migrations/0000_overconfident_black_queen.sql')
 
 describe('concurrent S3 drafting', () => {
   let pg: InstanceType<typeof PGlite>
@@ -27,11 +25,10 @@ describe('concurrent S3 drafting', () => {
     testDb = drizzle(pg, { schema })
 
     // Create test user
-    const passwordHash = await hashPassword('testpassword')
     const [user] = await testDb.insert(schema.users).values({
-      email: 'concurrent@test.com',
-      passwordHash,
-      name: 'Concurrent User',
+      githubId: 5001,
+      username: 'concurrent',
+      displayName: 'Concurrent User',
     }).returning({ id: schema.users.id })
     userId = user.id
 

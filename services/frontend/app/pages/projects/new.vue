@@ -3,7 +3,6 @@ const { createProject } = useProjects()
 
 const name = ref('')
 const gitUrl = ref('')
-const sshPrivateKey = ref('')
 const specsPath = ref('/specs')
 const error = ref('')
 const loading = ref(false)
@@ -15,7 +14,6 @@ async function handleSubmit() {
     const project = await createProject({
       name: name.value,
       gitUrl: gitUrl.value,
-      sshPrivateKey: sshPrivateKey.value,
       specsPath: specsPath.value || undefined,
     })
     await navigateTo(`/projects/${project.id}`)
@@ -46,27 +44,16 @@ async function handleSubmit() {
         </div>
 
         <div>
-          <label for="gitUrl" class="block text-sm font-medium text-gray-300 mb-1">Git URL</label>
+          <label for="gitUrl" class="block text-sm font-medium text-gray-300 mb-1">GitHub Repository URL</label>
           <input
             id="gitUrl"
             v-model="gitUrl"
             type="text"
             required
             class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm"
-            placeholder="git@github.com:org/repo.git"
+            placeholder="https://github.com/org/repo"
           />
-        </div>
-
-        <div>
-          <label for="sshKey" class="block text-sm font-medium text-gray-300 mb-1">SSH Private Key</label>
-          <textarea
-            id="sshKey"
-            v-model="sshPrivateKey"
-            required
-            rows="6"
-            class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-xs"
-            placeholder="-----BEGIN OPENSSH PRIVATE KEY-----"
-          />
+          <p class="mt-1 text-xs text-gray-500">Your GitHub token will be used for repo access.</p>
         </div>
 
         <div>

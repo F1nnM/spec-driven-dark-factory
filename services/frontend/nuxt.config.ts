@@ -25,8 +25,11 @@ export default defineNuxtConfig({
     hasuraAdminSecret: '',
     hasuraInternalEndpoint: '',
     encryptionKey: '',
-    sessionPassword: '',
+    githubClientId: '',
+    githubClientSecret: '',
+    baseUrl: 'http://localhost:3000',
     agentUrl: 'http://agent:3001',
+    allowedUsers: '',
     public: {
       hasuraHttpEndpoint: '',
       hasuraWsEndpoint: '',

@@ -2,7 +2,7 @@ import { eq, and } from 'drizzle-orm'
 import { createError, readBody } from 'h3'
 
 export default defineEventHandler(async (event) => {
-  const { userId } = await requireAuth(event)
+  const user = await requireAuth(event)
   const projectId = getRouterParam(event, 'id')
 
   if (!projectId) {
@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
   const membership = await db
     .select()
     .from(projectMembers)
-    .where(and(eq(projectMembers.projectId, projectId), eq(projectMembers.userId, userId)))
+    .where(and(eq(projectMembers.projectId, projectId), eq(projectMembers.userId, user.id)))
     .limit(1)
 
   if (membership.length === 0) {
@@ -21,17 +21,17 @@ export default defineEventHandler(async (event) => {
   }
 
   const body = await readBody(event)
-  const email = body?.email?.trim()?.toLowerCase()
+  const username = body?.username?.trim()
 
-  if (!email) {
-    throw createError({ statusCode: 400, statusMessage: 'Email is required' })
+  if (!username) {
+    throw createError({ statusCode: 400, statusMessage: 'Username is required' })
   }
 
-  // Find user by email
+  // Find user by username
   const [targetUser] = await db
-    .select({ id: users.id, email: users.email, name: users.name })
+    .select({ id: users.id, username: users.username, displayName: users.displayName, avatarUrl: users.avatarUrl })
     .from(users)
-    .where(eq(users.email, email))
+    .where(eq(users.username, username))
     .limit(1)
 
   if (!targetUser) {

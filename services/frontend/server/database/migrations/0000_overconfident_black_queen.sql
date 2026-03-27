@@ -40,6 +40,7 @@ CREATE TABLE "projects" (
 	"name" text NOT NULL,
 	"git_url" text NOT NULL,
 	"ssh_private_key_encrypted" text,
+	"git_token_user_id" uuid,
 	"specs_path" text DEFAULT '/specs' NOT NULL,
 	"current_revision" integer DEFAULT 0,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL
@@ -55,13 +56,23 @@ CREATE TABLE "revisions" (
 	"completed_at" timestamp with time zone
 );
 --> statement-breakpoint
+CREATE TABLE "sessions" (
+	"id" text PRIMARY KEY NOT NULL,
+	"user_id" uuid NOT NULL,
+	"expires_at" timestamp with time zone NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE "users" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"email" text NOT NULL,
-	"password_hash" text NOT NULL,
-	"name" text NOT NULL,
+	"github_id" integer NOT NULL,
+	"username" text NOT NULL,
+	"display_name" text,
+	"avatar_url" text,
+	"encrypted_github_token" text,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
-	CONSTRAINT "users_email_unique" UNIQUE("email")
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "users_github_id_unique" UNIQUE("github_id")
 );
 --> statement-breakpoint
 ALTER TABLE "agent_threads" ADD CONSTRAINT "agent_threads_project_id_projects_id_fk" FOREIGN KEY ("project_id") REFERENCES "public"."projects"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
@@ -69,4 +80,6 @@ ALTER TABLE "chat_messages" ADD CONSTRAINT "chat_messages_revision_id_revisions_
 ALTER TABLE "evolution_steps" ADD CONSTRAINT "evolution_steps_revision_id_revisions_id_fk" FOREIGN KEY ("revision_id") REFERENCES "public"."revisions"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "project_members" ADD CONSTRAINT "project_members_project_id_projects_id_fk" FOREIGN KEY ("project_id") REFERENCES "public"."projects"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "project_members" ADD CONSTRAINT "project_members_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "revisions" ADD CONSTRAINT "revisions_project_id_projects_id_fk" FOREIGN KEY ("project_id") REFERENCES "public"."projects"("id") ON DELETE cascade ON UPDATE no action;
+ALTER TABLE "projects" ADD CONSTRAINT "projects_git_token_user_id_users_id_fk" FOREIGN KEY ("git_token_user_id") REFERENCES "public"."users"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "revisions" ADD CONSTRAINT "revisions_project_id_projects_id_fk" FOREIGN KEY ("project_id") REFERENCES "public"."projects"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "sessions" ADD CONSTRAINT "sessions_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;

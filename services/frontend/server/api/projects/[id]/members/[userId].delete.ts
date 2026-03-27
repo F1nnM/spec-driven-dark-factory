@@ -2,7 +2,7 @@ import { eq, and } from 'drizzle-orm'
 import { createError } from 'h3'
 
 export default defineEventHandler(async (event) => {
-  const { userId: callerId } = await requireAuth(event)
+  const caller = await requireAuth(event)
   const projectId = getRouterParam(event, 'id')
   const targetUserId = getRouterParam(event, 'userId')
 
@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
   const membership = await db
     .select()
     .from(projectMembers)
-    .where(and(eq(projectMembers.projectId, projectId), eq(projectMembers.userId, callerId)))
+    .where(and(eq(projectMembers.projectId, projectId), eq(projectMembers.userId, caller.id)))
     .limit(1)
 
   if (membership.length === 0) {

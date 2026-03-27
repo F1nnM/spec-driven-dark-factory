@@ -33,12 +33,14 @@ stringData:
   HASURA_GRAPHQL_ADMIN_SECRET: "{hasura_secret}"
   ANTHROPIC_API_KEY: "{anthropic_key}"
   ENCRYPTION_KEY: "{encryption_key}"
-  NUXT_SESSION_PASSWORD: "{session_password}"
+  GITHUB_CLIENT_ID: "{github_client_id}"
+  GITHUB_CLIENT_SECRET: "{github_client_secret}"
 """.format(
     hasura_secret=env_vars.get('HASURA_GRAPHQL_ADMIN_SECRET', 'specfactory-dev-secret'),
     anthropic_key=env_vars.get('ANTHROPIC_API_KEY', ''),
     encryption_key=env_vars.get('ENCRYPTION_KEY', ''),
-    session_password=env_vars.get('NUXT_SESSION_PASSWORD', ''),
+    github_client_id=env_vars.get('GITHUB_CLIENT_ID', ''),
+    github_client_secret=env_vars.get('GITHUB_CLIENT_SECRET', ''),
 )))
 
 # PostgreSQL

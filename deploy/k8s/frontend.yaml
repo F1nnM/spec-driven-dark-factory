@@ -34,11 +34,18 @@ spec:
                 secretKeyRef:
                   name: spec-factory-secrets
                   key: ENCRYPTION_KEY
-            - name: NUXT_SESSION_PASSWORD
+            - name: NUXT_GITHUB_CLIENT_ID
               valueFrom:
                 secretKeyRef:
                   name: spec-factory-secrets
-                  key: NUXT_SESSION_PASSWORD
+                  key: GITHUB_CLIENT_ID
+            - name: NUXT_GITHUB_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: spec-factory-secrets
+                  key: GITHUB_CLIENT_SECRET
+            - name: NUXT_BASE_URL
+              value: http://localhost:3000
             - name: NUXT_PUBLIC_HASURA_HTTP_ENDPOINT
               value: http://localhost:8080/v1/graphql
             - name: NUXT_PUBLIC_HASURA_WS_ENDPOINT

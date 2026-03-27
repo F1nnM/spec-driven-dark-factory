@@ -5,9 +5,7 @@ import { drizzle } from 'drizzle-orm/pglite'
 import { eq, asc } from 'drizzle-orm'
 import { describe, expect, it, beforeAll, afterAll } from 'vitest'
 import * as schema from '../../server/database/schema'
-import { hashPassword } from '../../server/utils/password'
-
-const migrationPath = resolve(__dirname, '../../server/database/migrations/0000_mushy_edwin_jarvis.sql')
+const migrationPath = resolve(__dirname, '../../server/database/migrations/0000_overconfident_black_queen.sql')
 
 describe('chat messages and revision management', () => {
   let pg: InstanceType<typeof PGlite>
@@ -27,11 +25,10 @@ describe('chat messages and revision management', () => {
     testDb = drizzle(pg, { schema })
 
     // Create test user
-    const passwordHash = await hashPassword('testpassword')
     const [user] = await testDb.insert(schema.users).values({
-      email: 'drafter@test.com',
-      passwordHash,
-      name: 'Drafter',
+      githubId: 2001,
+      username: 'drafter',
+      displayName: 'Drafter',
     }).returning({ id: schema.users.id })
     userId = user.id
 

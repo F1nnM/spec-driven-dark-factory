@@ -1,17 +1,14 @@
-import { eq } from 'drizzle-orm'
-
 export default defineEventHandler(async (event) => {
-  const { userId } = await requireAuth(event)
-
-  const [user] = await db.select({
-    id: users.id,
-    email: users.email,
-    name: users.name,
-  }).from(users).where(eq(users.id, userId)).limit(1)
-
+  const user = event.context.user
   if (!user) {
-    throw createError({ statusCode: 401, statusMessage: 'User not found' })
+    throw createError({ statusCode: 401, statusMessage: 'Not authenticated' })
   }
-
-  return { user }
+  return {
+    user: {
+      id: user.id,
+      username: user.username,
+      displayName: user.displayName,
+      avatarUrl: user.avatarUrl,
+    },
+  }
 })

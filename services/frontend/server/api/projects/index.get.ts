@@ -1,7 +1,7 @@
 import { eq, sql } from 'drizzle-orm'
 
 export default defineEventHandler(async (event) => {
-  const { userId } = await requireAuth(event)
+  const user = await requireAuth(event)
 
   const rows = await db
     .select({
@@ -18,7 +18,7 @@ export default defineEventHandler(async (event) => {
     .where(
       sql`${projects.id} IN (
         SELECT ${projectMembers.projectId} FROM ${projectMembers}
-        WHERE ${projectMembers.userId} = ${userId}
+        WHERE ${projectMembers.userId} = ${user.id}
       )`,
     )
     .groupBy(projects.id)

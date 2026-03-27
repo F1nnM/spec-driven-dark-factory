@@ -5,7 +5,7 @@ import { describe, expect, it, beforeAll, afterAll } from 'vitest'
 import { encrypt, decrypt } from '../../server/utils/crypto'
 import { randomBytes } from 'node:crypto'
 
-const migrationPath = resolve(__dirname, '../../server/database/migrations/0000_mushy_edwin_jarvis.sql')
+const migrationPath = resolve(__dirname, '../../server/database/migrations/0000_overconfident_black_queen.sql')
 
 describe('database schema', () => {
   let pg: InstanceType<typeof PGlite>
@@ -39,6 +39,7 @@ describe('database schema', () => {
       'project_members',
       'projects',
       'revisions',
+      'sessions',
       'users',
     ])
   })
@@ -78,10 +79,10 @@ describe('database schema', () => {
   })
 
   it('enforces foreign key from revisions to projects', async () => {
-    // Insert a project first
+    // Insert a user first
     await pg.exec(`
-      INSERT INTO users (id, email, password_hash, name)
-      VALUES ('00000000-0000-0000-0000-000000000001', 'test@test.com', 'hash', 'Test')
+      INSERT INTO users (id, github_id, username)
+      VALUES ('00000000-0000-0000-0000-000000000001', 10001, 'testuser')
     `)
     await pg.exec(`
       INSERT INTO projects (id, name, git_url)
@@ -125,11 +126,28 @@ describe('database schema', () => {
     expect(Number((after.rows[0] as any).cnt)).toBe(0)
   })
 
-  it('enforces unique email constraint on users', async () => {
+  it('enforces unique github_id constraint on users', async () => {
     await expect(pg.exec(`
-      INSERT INTO users (id, email, password_hash, name)
-      VALUES ('00000000-0000-0000-0000-000000000002', 'test@test.com', 'hash2', 'Duplicate')
+      INSERT INTO users (id, github_id, username)
+      VALUES ('00000000-0000-0000-0000-000000000002', 10001, 'duplicate')
     `)).rejects.toThrow()
+  })
+
+  it('cascade deletes sessions when user is deleted', async () => {
+    // Create a user with a session
+    await pg.exec(`
+      INSERT INTO users (id, github_id, username)
+      VALUES ('00000000-0000-0000-0000-000000000003', 10003, 'sessionuser')
+    `)
+    await pg.exec(`
+      INSERT INTO sessions (id, user_id, expires_at)
+      VALUES ('session-token-123', '00000000-0000-0000-0000-000000000003', NOW() + INTERVAL '30 days')
+    `)
+
+    await pg.exec(`DELETE FROM users WHERE id = '00000000-0000-0000-0000-000000000003'`)
+
+    const result = await pg.query(`SELECT count(*) as cnt FROM sessions WHERE id = 'session-token-123'`)
+    expect(Number((result.rows[0] as any).cnt)).toBe(0)
   })
 })
 

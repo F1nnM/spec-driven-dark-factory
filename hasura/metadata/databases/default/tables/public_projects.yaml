@@ -2,6 +2,13 @@ table:
   name: projects
   schema: public
 array_relationships:
+  - name: agent_threads
+    using:
+      foreign_key_constraint_on:
+        column: project_id
+        table:
+          name: agent_threads
+          schema: public
   - name: members
     using:
       foreign_key_constraint_on:
@@ -16,13 +23,17 @@ array_relationships:
         table:
           name: revisions
           schema: public
-  - name: agent_threads
-    using:
-      foreign_key_constraint_on:
-        column: project_id
-        table:
-          name: agent_threads
-          schema: public
+insert_permissions:
+  - role: user
+    permission:
+      check:
+        id:
+          _in: X-Hasura-Project-Ids
+      columns:
+        - name
+        - git_url
+        - ssh_private_key_encrypted
+        - specs_path
 select_permissions:
   - role: user
     permission:
@@ -36,17 +47,6 @@ select_permissions:
       filter:
         id:
           _in: X-Hasura-Project-Ids
-insert_permissions:
-  - role: user
-    permission:
-      columns:
-        - name
-        - git_url
-        - ssh_private_key_encrypted
-        - specs_path
-      check:
-        id:
-          _in: X-Hasura-Project-Ids
 update_permissions:
   - role: user
     permission:
@@ -58,6 +58,7 @@ update_permissions:
       filter:
         id:
           _in: X-Hasura-Project-Ids
+      check: null
 delete_permissions:
   - role: user
     permission:

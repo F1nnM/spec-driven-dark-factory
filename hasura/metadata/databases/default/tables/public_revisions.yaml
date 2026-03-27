@@ -1,0 +1,59 @@
+table:
+  name: revisions
+  schema: public
+object_relationships:
+  - name: project
+    using:
+      foreign_key_constraint_on: project_id
+array_relationships:
+  - name: evolution_steps
+    using:
+      foreign_key_constraint_on:
+        column: revision_id
+        table:
+          name: evolution_steps
+          schema: public
+  - name: chat_messages
+    using:
+      foreign_key_constraint_on:
+        column: revision_id
+        table:
+          name: chat_messages
+          schema: public
+select_permissions:
+  - role: user
+    permission:
+      columns:
+        - id
+        - project_id
+        - revision_number
+        - status
+        - branch_name
+        - created_at
+        - completed_at
+      filter:
+        project:
+          id:
+            _in: X-Hasura-Project-Ids
+insert_permissions:
+  - role: user
+    permission:
+      columns:
+        - project_id
+        - revision_number
+        - status
+        - branch_name
+      check:
+        project:
+          id:
+            _in: X-Hasura-Project-Ids
+update_permissions:
+  - role: user
+    permission:
+      columns:
+        - status
+        - completed_at
+      filter:
+        project:
+          id:
+            _in: X-Hasura-Project-Ids

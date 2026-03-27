@@ -1,0 +1,33 @@
+table:
+  name: chat_messages
+  schema: public
+object_relationships:
+  - name: revision
+    using:
+      foreign_key_constraint_on: revision_id
+select_permissions:
+  - role: user
+    permission:
+      columns:
+        - id
+        - revision_id
+        - role
+        - content
+        - created_at
+      filter:
+        revision:
+          project:
+            id:
+              _in: X-Hasura-Project-Ids
+insert_permissions:
+  - role: user
+    permission:
+      columns:
+        - revision_id
+        - role
+        - content
+      check:
+        revision:
+          project:
+            id:
+              _in: X-Hasura-Project-Ids

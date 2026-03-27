@@ -1,3 +1,4 @@
+import { Hono } from 'hono'
 import { handleClone, handleStatus } from './api/projects.js'
 import { handleGetSpecs } from './api/specs.js'
 import { handleDraft } from './api/drafter.js'
@@ -8,80 +9,73 @@ import { handleAnalyze } from './api/analyzer.js'
 import { handleInterrupt } from './api/interrupt.js'
 import { handleRestructureEvaluate, handleRestructureExecute } from './api/restructure.js'
 
-export async function handleRequest(req: Request): Promise<Response> {
-  const url = new URL(req.url)
+const app = new Hono()
 
-  if (url.pathname === '/health') {
-    return Response.json({ status: 'ok' })
-  }
+// Health
+app.get('/health', (c) => c.json({ status: 'ok' }))
 
-  if (url.pathname === '/api/projects/clone' && req.method === 'POST') {
-    return handleClone(req)
-  }
+// Projects
+app.post('/api/projects/clone', async (c) => {
+  return handleClone(c.req.raw)
+})
+app.get('/api/projects/:projectId/status', async (c) => {
+  return handleStatus(c.req.raw, c.req.param('projectId'))
+})
 
-  const statusMatch = url.pathname.match(/^\/api\/projects\/([^/]+)\/status$/)
-  if (statusMatch && req.method === 'GET') {
-    return handleStatus(req, statusMatch[1]!)
-  }
+// Specs
+app.get('/api/projects/:projectId/specs', async (c) => {
+  return handleGetSpecs(c.req.raw, c.req.param('projectId'))
+})
 
-  const specsMatch = url.pathname.match(/^\/api\/projects\/([^/]+)\/specs$/)
-  if (specsMatch && req.method === 'GET') {
-    return handleGetSpecs(req, specsMatch[1]!)
-  }
+// Drafter
+app.post('/api/projects/:projectId/draft', async (c) => {
+  return handleDraft(c.req.raw, c.req.param('projectId'))
+})
 
-  const draftMatch = url.pathname.match(/^\/api\/projects\/([^/]+)\/draft$/)
-  if (draftMatch && req.method === 'POST') {
-    return handleDraft(req, draftMatch[1]!)
-  }
+// Evolution
+app.post('/api/projects/:projectId/plan', async (c) => {
+  return handlePlan(c.req.raw, c.req.param('projectId'))
+})
+app.post('/api/projects/:projectId/approve', async (c) => {
+  return handleApprove(c.req.raw, c.req.param('projectId'))
+})
 
-  const planMatch = url.pathname.match(/^\/api\/projects\/([^/]+)\/plan$/)
-  if (planMatch && req.method === 'POST') {
-    return handlePlan(req, planMatch[1]!)
-  }
+// Pipeline
+app.post('/api/projects/:projectId/implement', async (c) => {
+  return handleImplement(c.req.raw, c.req.param('projectId'))
+})
 
-  const approveMatch = url.pathname.match(/^\/api\/projects\/([^/]+)\/approve$/)
-  if (approveMatch && req.method === 'POST') {
-    return handleApprove(req, approveMatch[1]!)
-  }
+// Fulfillment
+app.post('/api/projects/:projectId/audit', async (c) => {
+  return handleAudit(c.req.raw, c.req.param('projectId'))
+})
 
-  const implementMatch = url.pathname.match(/^\/api\/projects\/([^/]+)\/implement$/)
-  if (implementMatch && req.method === 'POST') {
-    return handleImplement(req, implementMatch[1]!)
-  }
+// Analyzer
+app.post('/api/projects/:projectId/analyze', async (c) => {
+  return handleAnalyze(c.req.raw, c.req.param('projectId'))
+})
 
-  const interruptMatch = url.pathname.match(/^\/api\/projects\/([^/]+)\/interrupt$/)
-  if (interruptMatch && req.method === 'POST') {
-    return handleInterrupt(req, interruptMatch[1]!)
-  }
+// Restructure
+app.post('/api/projects/:projectId/restructure/evaluate', async (c) => {
+  return handleRestructureEvaluate(c.req.raw, c.req.param('projectId'))
+})
+app.post('/api/projects/:projectId/restructure/execute', async (c) => {
+  return handleRestructureExecute(c.req.raw, c.req.param('projectId'))
+})
 
-  const auditMatch = url.pathname.match(/^\/api\/projects\/([^/]+)\/audit$/)
-  if (auditMatch && req.method === 'POST') {
-    return handleAudit(req, auditMatch[1]!)
-  }
+// Interrupt
+app.post('/api/projects/:projectId/interrupt', async (c) => {
+  return handleInterrupt(c.req.raw, c.req.param('projectId'))
+})
 
-  const analyzeMatch = url.pathname.match(/^\/api\/projects\/([^/]+)\/analyze$/)
-  if (analyzeMatch && req.method === 'POST') {
-    return handleAnalyze(req, analyzeMatch[1]!)
-  }
-
-  const restructureEvalMatch = url.pathname.match(/^\/api\/projects\/([^/]+)\/restructure\/evaluate$/)
-  if (restructureEvalMatch && req.method === 'POST') {
-    return handleRestructureEvaluate(req, restructureEvalMatch[1]!)
-  }
-
-  const restructureExecMatch = url.pathname.match(/^\/api\/projects\/([^/]+)\/restructure\/execute$/)
-  if (restructureExecMatch && req.method === 'POST') {
-    return handleRestructureExecute(req, restructureExecMatch[1]!)
-  }
-
-  return new Response('Not Found', { status: 404 })
-}
+export default app
+export const handleRequest = app.fetch
 
 // Only start server when run directly (not imported by tests)
 if (typeof Bun !== 'undefined') {
   const server = Bun.serve({
     port: 3001,
-    fetch: handleRequest,
+    fetch: app.fetch,
   })
   console.log(`Agent service listening on http://localhost:${server.port}`)
 }

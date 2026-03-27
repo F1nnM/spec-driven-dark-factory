@@ -61,14 +61,15 @@ function sshEnv(sshKeyPath: string): Record<string, string> {
 
 export async function cloneRepo(
   url: string,
-  sshKeyPath: string,
+  sshKeyPathOrNull: string | null,
   destPath: string,
 ): Promise<void> {
   // Clone runs from parent dir; git clone creates destPath
   const { dirname } = await import('node:path')
   const parentDir = dirname(destPath)
   const baseName = destPath.split('/').pop()!
-  await execGit(parentDir, ['clone', url, baseName], sshEnv(sshKeyPath))
+  const env = sshKeyPathOrNull ? sshEnv(sshKeyPathOrNull) : undefined
+  await execGit(parentDir, ['clone', url, baseName], env)
 }
 
 export async function createBranch(

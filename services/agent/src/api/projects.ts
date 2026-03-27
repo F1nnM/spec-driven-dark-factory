@@ -27,7 +27,7 @@ export async function handleClone(req: Request): Promise<Response> {
   try {
     const body = (await req.json()) as {
       gitUrl: string
-      sshKey: string
+      sshKey?: string
       projectId: string
     }
 
@@ -45,7 +45,12 @@ export async function handleClone(req: Request): Promise<Response> {
       mkdirSync(REPOS_BASE, { recursive: true })
     }
 
-    const keyFile = writeSshKey(body.projectId, body.sshKey)
+    // Support both SSH key auth and HTTPS token auth (token embedded in URL)
+    let keyFile: string | null = null
+    if (body.sshKey) {
+      keyFile = writeSshKey(body.projectId, body.sshKey)
+    }
+
     await cloneRepo(body.gitUrl, keyFile, dest)
 
     return Response.json({ ok: true, path: dest })

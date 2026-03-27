@@ -11,13 +11,13 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "@apollo/client": "^4.1.6",
+    "@nuxtjs/apollo": "^5.0.0-alpha.16",
     "@spec-factory/shared": "workspace:*",
-    "@urql/exchange-graphcache": "^9.0.0",
-    "@urql/vue": "^1.4.2",
     "dompurify": "^3.2.4",
     "drizzle-orm": "^0.41.0",
     "graphql": "^16.10.0",
-    "graphql-ws": "^6.0.4",
+    "graphql-ws": "^6.0.8",
     "marked": "^15.0.7",
     "nuxt": "^4.4.2",
     "nuxt-auth-utils": "^0.5.29",

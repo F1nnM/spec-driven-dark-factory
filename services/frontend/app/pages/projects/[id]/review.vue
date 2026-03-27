@@ -10,7 +10,7 @@ const interrupting = ref(false)
 let pollInterval: ReturnType<typeof setInterval> | null = null
 
 // GraphQL subscription for real-time updates
-const subscriptionQuery = `
+const REVISION_STEPS_SUBSCRIPTION = gql`
   subscription RevisionSteps($projectId: uuid!) {
     revisions(
       where: { project_id: { _eq: $projectId }, status: { _in: ["implementing", "approved"] } }
@@ -34,24 +34,7 @@ const subscriptionQuery = `
   }
 `
 
-const { data: subscriptionData, close: closeSubscription } = useGraphqlSubscription<{
-  revisions: {
-    id: string
-    revision_number: number
-    status: string
-    branch_name: string
-    created_at: string
-    completed_at: string | null
-    evolution_steps: {
-      id: string
-      step_number: number
-      status: string
-      branch_name: string
-      review_loop_count: number
-      review_summary: string | null
-    }[]
-  }[]
-}>(subscriptionQuery, { projectId })
+const { result: subscriptionData } = useSubscription(REVISION_STEPS_SUBSCRIPTION, { projectId })
 
 // Update local state from subscription data
 watch(subscriptionData, (data) => {
@@ -83,7 +66,6 @@ onMounted(async () => {
 
 onUnmounted(() => {
   stopPolling()
-  closeSubscription()
 })
 
 watch(

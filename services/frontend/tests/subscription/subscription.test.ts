@@ -1,18 +1,31 @@
 import { describe, expect, it } from 'vitest'
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
 
-describe('useGraphqlSubscription', () => {
-  it('composable module exports expected function', async () => {
-    // Verify the module has the correct structure
-    // We test the setup logic without actual WebSocket by checking exports
-    const mod = await import('../../app/composables/useGraphqlSubscription')
-    expect(mod.useGraphqlSubscription).toBeDefined()
-    expect(typeof mod.useGraphqlSubscription).toBe('function')
+describe('Apollo module configuration', () => {
+  const configSource = readFileSync(resolve(__dirname, '../../nuxt.config.ts'), 'utf-8')
+
+  it('nuxt config includes @nuxtjs/apollo module', () => {
+    expect(configSource).toContain("'@nuxtjs/apollo'")
   })
 
-  it('creates a subscription function that accepts query and variables', async () => {
-    const { useGraphqlSubscription } = await import('../../app/composables/useGraphqlSubscription')
+  it('apollo config defines a default client with httpEndpoint', () => {
+    expect(configSource).toContain('httpEndpoint')
+  })
 
-    // The function signature accepts a query string and variables
-    expect(useGraphqlSubscription.length).toBeGreaterThanOrEqual(2)
+  it('apollo config defines a default client with wsEndpoint', () => {
+    expect(configSource).toContain('wsEndpoint')
+  })
+
+  it('package.json includes @nuxtjs/apollo dependency', () => {
+    const pkg = JSON.parse(readFileSync(resolve(__dirname, '../../package.json'), 'utf-8'))
+    expect(pkg.dependencies['@nuxtjs/apollo']).toBeDefined()
+    expect(pkg.dependencies['@apollo/client']).toBeDefined()
+  })
+
+  it('URQL packages are removed', () => {
+    const pkg = JSON.parse(readFileSync(resolve(__dirname, '../../package.json'), 'utf-8'))
+    expect(pkg.dependencies['@urql/vue']).toBeUndefined()
+    expect(pkg.dependencies['@urql/exchange-graphcache']).toBeUndefined()
   })
 })

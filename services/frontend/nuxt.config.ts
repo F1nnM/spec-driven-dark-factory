@@ -1,7 +1,16 @@
 import tailwindcss from '@tailwindcss/vite'
 
 export default defineNuxtConfig({
-  modules: ['nuxt-auth-utils'],
+  modules: ['nuxt-auth-utils', '@nuxtjs/apollo'],
+
+  apollo: {
+    clients: {
+      default: {
+        httpEndpoint: 'http://localhost:8080/v1/graphql',
+        wsEndpoint: 'ws://localhost:8080/v1/graphql',
+      },
+    },
+  },
 
   css: ['~/assets/css/tailwind.css'],
 
@@ -33,10 +42,7 @@ export default defineNuxtConfig({
         clientSecret: '',
       },
     },
-    public: {
-      hasuraHttpEndpoint: '',
-      hasuraWsEndpoint: '',
-    },
+    public: {},
   },
 
   compatibilityDate: '2026-03-27',

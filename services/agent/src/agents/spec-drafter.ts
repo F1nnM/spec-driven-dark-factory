@@ -1,6 +1,7 @@
 import type Anthropic from '@anthropic-ai/sdk'
 import { runReactAgent } from './react-loop.js'
 import { createGitSpecTools } from '../tools/git-spec-tools.js'
+import { createClaudeCodeResearchTool } from '../tools/claude-code-tool.js'
 
 export interface SpecDrafterContext {
   projectId: string
@@ -46,6 +47,7 @@ Description of the specification...
 
 ## Rules
 1. Always read existing specs first (use read_all_specs) before making changes to understand context.
+11. Use the research_codebase tool to understand the existing codebase when writing specs. This helps you write accurate acceptance criteria that reflect the actual architecture and implementation patterns.
 2. New specs default to status: draft and fulfillment: unfulfilled.
 3. Generate proper spec IDs in SPEC-NNN format, incrementing from the highest existing ID.
 4. Use appropriate categories — categories are AI-managed. Look at existing categories and reuse them when appropriate, or create new ones when needed.
@@ -67,7 +69,10 @@ export async function runSpecDrafter(
   client?: import('@anthropic-ai/sdk').default,
 ): Promise<{ response: string; updatedHistory: Anthropic.Messages.MessageParam[] }> {
   const branchName = `revision-${context.revisionNumber}`
-  const tools = createGitSpecTools(context.repoPath, branchName, context.specsPath)
+  const tools = [
+    ...createGitSpecTools(context.repoPath, branchName, context.specsPath),
+    createClaudeCodeResearchTool(context.repoPath),
+  ]
 
   const messages: Anthropic.Messages.MessageParam[] = [
     ...chatHistory,

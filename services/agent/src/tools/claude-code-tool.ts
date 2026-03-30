@@ -28,6 +28,29 @@ export function createClaudeCodeTool(workDir: string): Tool {
   }
 }
 
+export function createClaudeCodeResearchTool(workDir: string): Tool {
+  return {
+    name: 'research_codebase',
+    description:
+      'Research the project codebase using Claude Code CLI in read-only mode. Use this to understand existing code, architecture, dependencies, file structure, or implementation details. Provide a question or research task. The tool can read files, search code, and analyze the project but cannot modify anything.',
+    input_schema: {
+      type: 'object' as const,
+      properties: {
+        question: {
+          type: 'string',
+          description: 'What to research in the codebase (e.g., "What authentication method is used?", "List all API endpoints", "How is the database schema structured?")',
+        },
+      },
+      required: ['question'],
+    },
+    async execute(input: Record<string, unknown>): Promise<string> {
+      const { question } = input as { question: string }
+      const prompt = `You are a code researcher. Answer this question about the codebase. Only read and analyze — do not modify any files.\n\nQuestion: ${question}`
+      return runClaudeCode(workDir, prompt, 120_000)
+    },
+  }
+}
+
 export function runClaudeCode(
   workDir: string,
   prompt: string,

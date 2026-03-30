@@ -35,5 +35,10 @@ export function useProjects() {
     return data.project
   }
 
-  return { projects, fetchProjects, createProject, fetchProject }
+  async function deleteProject(id: string): Promise<void> {
+    await $fetch(`/api/projects/${id}`, { method: 'DELETE' })
+    projects.value = projects.value.filter(p => p.id !== id)
+  }
+
+  return { projects, fetchProjects, createProject, fetchProject, deleteProject }
 }

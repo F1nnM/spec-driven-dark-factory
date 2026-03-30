@@ -1,10 +1,10 @@
 FROM oven/bun:1
 
-# Install git (repo operations) and Node.js (needed for Claude Code CLI)
-RUN apt-get update && apt-get install -y git nodejs npm && rm -rf /var/lib/apt/lists/*
+# Install git (repo operations)
+RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
 
-# Install Claude Code CLI globally
-RUN npm install -g @anthropic-ai/claude-code
+# Install Claude Code CLI globally via bun
+RUN bun install -g @anthropic-ai/claude-code
 WORKDIR /app
 COPY package.json bun.lock* ./
 COPY packages/shared/package.json packages/shared/package.json
